@@ -1,0 +1,44 @@
+.wheelContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  z-index: 1000;
+}
+
+.wheelItem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  
+  --angle: calc( (var(--i) / var(--total)) * 360deg );
+  --radius: 100px;
+
+  transform: 
+    translate(-50%, -50%) 
+    rotate(var(--angle)) 
+    translateY(var(--radius)) 
+    rotate(calc(-1 * var(--angle)));
+
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  padding: 5px;
+}
+
+.wheelItem:hover {
+  background: #4CAF50;
+}

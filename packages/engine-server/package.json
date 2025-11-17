@@ -1,0 +1,32 @@
+{
+    "name": "@tupynambagame/engine-server",
+    "version": "1.0.0",
+    "private": true,
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+        "build": "tsc",
+        "start": "node dist/index.js"
+    },
+    "dependencies": {
+        "@dimforge/rapier3d-compat": "^0.13.1",
+        "@fastify/cookie": "^11.0.2",
+        "@fastify/cors": "^11.1.0",
+        "@fastify/env": "^5.0.3",
+        "@fastify/jwt": "^10.0.0",
+        "@fastify/one-line-logger": "^2.0.2",
+        "@fastify/session": "^11.1.1",
+        "@tupynambagame/engine-core": "*",
+        "@types/bcrypt": "^6.0.0",
+        "bcrypt": "^6.0.0",
+        "fastify": "^5.6.2",
+        "fastify-plugin": "^4.5.1",
+        "mongoose": "^8.19.4",
+        "socket.io": "^4.7.5"
+    },
+    "devDependencies": {
+        "@types/node": "^20.12.12",
+        "ts-node-dev": "^2.0.0",
+        "typescript": "~5.8.3"
+    }
+}

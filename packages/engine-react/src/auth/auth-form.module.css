@@ -1,0 +1,72 @@
+.authContainer{
+    position: absolute;
+    right: 0;
+    width: 30vw;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    z-index: 1;
+    justify-content: center;
+}
+
+.authContainer form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vh;
+    height: auto;
+    width: 25vw;
+}
+
+.authContainer form div{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-wrap: nowrap;
+    gap: 0.8vh;
+}
+.authContainer form input{
+    padding: 1.5vh;
+    width: 100%;
+    border-radius: 2vh;
+    background: snow;
+    color: black;
+    border: none;
+    font-size: 1.5vh;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.authContainer form label{
+    color: snow;
+    font-size: 1.7vh;
+    align-self: flex-start;
+    margin-bottom: 0.5vh;
+}
+.authContainer form > button:nth-of-type(1){
+    padding: 1.5vh;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 2vh;
+    background: rgba(255, 215, 0, 0.9);
+    border: none;
+    margin-top: 1.5vh;
+    font-size: 1.9vh;
+    cursor: pointer;
+}
+.authContainer form > button:nth-of-type(2){
+    padding: 1vh;
+    width: 100%;
+    box-sizing: border-box;
+    color: snow;
+    border-radius: 2vh;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    font-size: 1.8vh;
+    cursor: pointer;
+}

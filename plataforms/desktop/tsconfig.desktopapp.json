@@ -1,0 +1,9 @@
+{
+  "extends": "../../packages/engine-react/tsconfig.engineapp.json",
+  "compilerOptions": {
+    "paths": {
+      "@renderer/*": ["src/renderer/*"]
+    }
+  },
+  "include": ["src/renderer", "src/preload/index.d.ts", "../packages/engine-react"]
+}

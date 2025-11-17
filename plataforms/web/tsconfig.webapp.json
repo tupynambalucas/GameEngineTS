@@ -1,0 +1,10 @@
+{
+  "extends": "../../packages/engine-react/tsconfig.engineapp.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "paths": {
+      "@/*": ["./src/*"],
+    }
+  },
+  "include": ["src", "../../packages/engine-react"]
+}

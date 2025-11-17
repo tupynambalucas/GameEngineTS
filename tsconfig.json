@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true, // A raiz não gera output
+    "baseUrl": ".",
+    "paths": {
+      "@/engine/*": ["./engine/*"]
+    }
+  },
+  "files": [],
+  "include": [],
+  "references": [
+    { "path": "./plataforms/desktop/tsconfig.json" },
+    { "path": "./plataforms/web/tsconfig.json" }
+  ]
+}

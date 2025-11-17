@@ -1,0 +1,31 @@
+node_modules/
+/package-lock.json
+
+# --- Desktop Plataform ---
+/plataforms/desktop/dist/
+/plataforms/desktop/out/
+/plataforms/desktop/.eslintcache
+
+# --- Web Plataform ---
+/plataforms/web/dist/
+/plataforms/web/dist-ssr/
+/plataforms/web/*.local
+/plataforms/web/.vite/
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Sistema Operacional e IDEs ---
+.DS_Store
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

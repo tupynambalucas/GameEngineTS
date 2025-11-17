@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "composite": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.webapp.json" },
+    { "path": "./tsconfig.webnode.json" }
+  ]
+}

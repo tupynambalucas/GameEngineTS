@@ -1,0 +1,55 @@
+{
+  "name": "@tupynambagame/monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "plataforms/desktop",
+    "plataforms/web",
+    "packages/engine-core",
+    "packages/engine-react",
+    "packages/engine-server",
+    "packages/engine-assets"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w @tupynambagame/plataform-web",
+    "dev:desktop": "npm run dev -w @tupynambagame/plataform-desktop",
+    "dev:server": "npm run dev -w @tupynambagame/engine-server",
+    "build:web": "npm run build -w @tupynambagame/plataform-web",
+    "build:desktop": "npm run build -w @tupynambagame/plataform-desktop",
+    "build:server": "npm run build -w @tupynambagame/engine-server",
+    "start:server": "npm run start -w @tupynambagame/engine-server",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.4.0",
+    "@react-three/postprocessing": "^3.0.4",
+    "@react-three/rapier": "^2.2.0",
+    "@xstate/react": "^6.0.0",
+    "ecctrl": "^1.0.97",
+    "gsap": "^3.13.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.181.1",
+    "tone": "^15.1.22",
+    "xstate": "^5.24.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/node": "^24.4.0",
+    "@types/react": "^19.0.0-rc.0",
+    "@types/react-dom": "^19.0.0-rc.0",
+    "@types/three": "^0.178.0",
+    "@vitejs/plugin-react-swc": "^4.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.39.1",
+    "vite-plugin-glsl": "^1.5.1",
+    "vite-plugin-svgr": "^4.3.0",
+    "vite-tsconfig-paths": "^5.1.4"
+  }
+}
