@@ -16,58 +16,53 @@ export const useEmoteAnimations = ({
   loop,
   onEmoteFinished,
 }: UseEmoteAnimationsProps) => {
+  console.log('Should run emoteName:', emoteName);
   const { animations } = useGLTF(EmotesUrl);
+  // Adicione o <any> ou a tipagem correta se necessário para evitar conflito de types do Three
   const { actions, mixer } = useAnimations(animations, groupRef);
 
-  const emoteFinishedCallback = useRef(onEmoteFinished);
-  emoteFinishedCallback.current = onEmoteFinished;
+  const onFinishRef = useRef<((e: any) => void) | null>(null);
 
   useEffect(() => {
+    // Se não tivermos actions, ref ou nome do emote, paramos tudo.
     if (!actions || !groupRef.current || !emoteName) {
+      // Opcional: Fade out de segurança se o emoteName virar null abruptamente
       return;
     }
 
     const currentAction = actions[emoteName];
+    
     if (!currentAction) {
       console.warn(`Emote "${emoteName}" não encontrado.`);
+      // Se não achou a animação, encerra o estado de emote para não travar o boneco
+      onEmoteFinished(); 
       return;
     }
 
-    Object.values(actions).forEach(action => {
-      if (action && action !== currentAction) {
-        action.fadeOut(0.2);
+    // Configura a animação
+    currentAction.reset().fadeIn(0.2).setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, 1).play();
+    currentAction.clampWhenFinished = !loop;
+
+    // Handler de cleanup e finish
+    const handleFinished = (e: any) => {
+      if (e.action === currentAction) {
+        onEmoteFinished();
       }
-    });
+    };
 
-    currentAction.reset().fadeIn(0.2).play();
-    
-    let onFinish: ((e: any) => void) | undefined = undefined;
-
-    if (loop) {
-      currentAction.setLoop(THREE.LoopRepeat, Infinity);
-    } else {
-      currentAction.setLoop(THREE.LoopOnce, 1);
-      currentAction.clampWhenFinished = true;
-
-      onFinish = (e: any) => {
-        if (e.action === currentAction) {
-          mixer.removeEventListener('finished', onFinish!);
-          emoteFinishedCallback.current();
-        }
-      };
-
-      mixer.removeEventListener('finished', onFinish);
-      mixer.addEventListener('finished', onFinish);
+    if (!loop) {
+      mixer.addEventListener('finished', handleFinished);
+      onFinishRef.current = handleFinished;
     }
-    
+
     return () => {
-      if (onFinish) {
-        mixer.removeEventListener('finished', onFinish);
-      }
       currentAction.fadeOut(0.2);
-    }
-
-  }, [actions, mixer, groupRef, emoteName, loop, emoteFinishedCallback]);
+      if (onFinishRef.current) {
+        mixer.removeEventListener('finished', onFinishRef.current);
+        onFinishRef.current = null;
+      }
+    };
+  }, [actions, mixer, groupRef, emoteName, loop]); // Removi onEmoteFinished das deps para evitar re-subscriptions desnecessários
 
   return { actions };
 };

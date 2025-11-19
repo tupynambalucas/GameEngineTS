@@ -1,6 +1,6 @@
-import { createMachine, assign } from 'xstate';
+import { setup, assign } from 'xstate';
 
-type PlayerEvent =
+export type PlayerEvent =
   | { type: 'WALK' }
   | { type: 'RUN' }
   | { type: 'JUMP' }
@@ -11,60 +11,71 @@ type PlayerEvent =
   | { type: 'EMOTE'; emoteName: string } 
   | { type: 'EMOTE_FINISHED' };
 
-interface PlayerContext {
+export interface PlayerContext {
   currentEmote: string | null;
 }
 
-export const PlayerStateMachine = createMachine<PlayerContext, PlayerEvent>({
+const playerSetup = setup({
+  types: {
+    context: {} as PlayerContext,
+    events: {} as PlayerEvent,
+  },
+});
+
+export const PlayerStateMachine = playerSetup.createMachine({
   id: 'player',
   initial: 'idle',
   context: {
     currentEmote: null,
   },
-  types: {
-    events: {} as PlayerEvent,
-  },
   states: {
     idle: {
       on: {
-        WALK: 'walking',
-        JUMP: 'jumping',
+        WALK: { target: 'walking' },
+        RUN: { target: 'running' }, 
+        JUMP: { target: 'jumping' }, // Pulo parado
         EMOTE: {
           target: 'emoting',
           actions: assign({
-            currentEmote: ({ event }) => event.emoteName,
+            currentEmote: ({ event }) => event.type === 'EMOTE' ? event.emoteName : null
           }),
         },
       },
     },
     walking: {
       on: {
-        STOP: 'idle',
-        JUMP: 'jumping',
-        RUN: 'running',
+        STOP: { target: 'idle' },
+        JUMP: { target: 'walkingJumping' }, // ALTERADO: Agora vai para WalkingJumping
+        RUN: { target: 'running' },
         EMOTE: {
           target: 'emoting',
           actions: assign({
-            currentEmote: ({ event }) => event.emoteName,
+            currentEmote: ({ event }) => event.type === 'EMOTE' ? event.emoteName : null
           }),
         },
       },
     },
     running: {
       on: {
-        STOP: 'idle',
-        STOP_RUN: 'walking',
-        JUMP: 'runningJumping',
+        STOP: { target: 'idle' },
+        STOP_RUN: { target: 'walking' },
+        JUMP: { target: 'runningJumping' }, // Pulo correndo
       },
     },
     jumping: {
       on: {
-        LAND: 'landing',
+        LAND: { target: 'landing' },
+      },
+    },
+    // NOVO ESTADO
+    walkingJumping: {
+      on: {
+        LAND: { target: 'landing' },
       },
     },
     runningJumping: {
       on: {
-        LAND: 'landing',
+        LAND: { target: 'landing' },
       },
     },
     landing: {
@@ -72,11 +83,11 @@ export const PlayerStateMachine = createMachine<PlayerContext, PlayerEvent>({
         ANIM_FINISHED: [
           {
             target: 'running',
-            guard: ({ event }) => event.isMoving && event.isSprinting,
+            guard: ({ event }) => event.type === 'ANIM_FINISHED' && event.isMoving && event.isSprinting,
           },
           {
             target: 'walking',
-            guard: ({ event }) => event.isMoving,
+            guard: ({ event }) => event.type === 'ANIM_FINISHED' && event.isMoving,
           },
           {
             target: 'idle',
@@ -86,11 +97,11 @@ export const PlayerStateMachine = createMachine<PlayerContext, PlayerEvent>({
     },
     emoting: {
       on: {
+        WALK: { target: 'walking', actions: assign({ currentEmote: null }) },
+        RUN: { target: 'running', actions: assign({ currentEmote: null }) },
         EMOTE_FINISHED: {
           target: 'idle',
-          actions: assign({
-            currentEmote: null,
-          }),
+          actions: assign({ currentEmote: null }),
         }
       },
     },

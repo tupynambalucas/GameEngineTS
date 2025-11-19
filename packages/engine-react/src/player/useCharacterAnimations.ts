@@ -8,6 +8,7 @@ const ANIMATION_MAP = {
   walking: 'Walking',
   running: 'Running',
   jumping: 'Jumping',
+  walkingJumping: 'WalkingJumping', // ADICIONADO: Mapeamento para a animação no GLB
   runningJumping: 'RunningJumping',
 };
 
@@ -16,6 +17,7 @@ export const useCharacterAnimations = (
   currentState: string | null,
   onAnimationFinished: () => void
 ) => {
+  console.log('useCharacterAnimations currentState:', currentState);
   const { animations } = useGLTF(LocomotionUrl);
   const { actions } = useAnimations(animations, groupRef);
 
@@ -55,7 +57,12 @@ export const useCharacterAnimations = (
 
     currentAnimation.current = nextActionName;
 
-    if (nextActionName === 'Jumping' || nextActionName === 'RunningJumping') {
+    // ADICIONADO: Verificação para WalkingJumping
+    if (
+      nextActionName === 'Jumping' || 
+      nextActionName === 'RunningJumping' || 
+      nextActionName === 'WalkingJumping'
+    ) {
       current.reset().fadeIn(0.2).play();
       current.setLoop(THREE.LoopOnce, 1);
       

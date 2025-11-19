@@ -1,4 +1,4 @@
-import React, { useRef, forwardRef, useImperativeHandle, useState, useEffect } from 'react';
+import React, { useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import {
@@ -24,27 +24,27 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
   const colliderRef = useRef<RapierCollider | null>(null);
 
   const { scene } = useGLTF(AmyUrl);
-
   const input = useInputControls();
-  const { camera } = useThree();
-
+  
+  // Acesso ao gl para manipular o canvas DOM element diretamente (importante para pointer lock)
+  const { camera, gl } = useThree(); 
   const { rapier, world } = useRapier();
 
   const [state, send] = useMachine(PlayerStateMachine);
   const jumpPressed = useRef(false);
 
-  // Removido: const [currentEmote, setCurrentEmote] = useState<string | null>(null);
-
   const openEmoteWheel = useGameStore((s) => s.openEmoteWheel);
   const closeEmoteWheel = useGameStore((s) => s.closeEmoteWheel);
   const isPointerLocked = useGameStore((s) => s.isPointerLocked);
   
-  const canvasElement = document.querySelector('canvas');
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Previne disparos múltiplos ao segurar a tecla
+      if (e.repeat) return;
+
+      // Abre o menu e solta o mouse
       if (e.code === 'KeyB' && !state.matches('emoting')) {
-        if (isPointerLocked) {
+        if (document.pointerLockElement) {
           document.exitPointerLock();
         }
         openEmoteWheel();
@@ -53,13 +53,18 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
 
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.code === 'KeyB') {
+        // Fecha a UI e recupera qual emote foi selecionado (se houver)
         const selectedEmote = closeEmoteWheel();
         
         if (selectedEmote) {
-          send({ type: 'EMOTE', emoteName: selectedEmote }); // 1. Envia o nome no evento
-        } else {
-          canvasElement?.requestPointerLock();
-        }
+          send({ type: 'EMOTE', emoteName: selectedEmote }); 
+        } 
+        
+        // setTimeout garante que o React teve tempo de remover a UI do EmoteWheel
+        // antes de solicitar o pointer lock novamente.
+        setTimeout(() => {
+          gl.domElement.requestPointerLock();
+        }, 50);
       }
     };
 
@@ -69,7 +74,7 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [state, openEmoteWheel, closeEmoteWheel, send, isPointerLocked, canvasElement]);
+  }, [state, openEmoteWheel, closeEmoteWheel, send, gl]);
 
   const onLocomotionFinished = () => {
     const isMoving = input.forward || input.backward || input.left || input.right;
@@ -78,7 +83,10 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
   
   const onEmoteFinished = () => {
     send({ type: 'EMOTE_FINISHED' });
-    canvasElement?.requestPointerLock();
+    // Segurança extra: se a animação acabou e não estamos travados, trava novamente
+    if (document.pointerLockElement !== gl.domElement) {
+        gl.domElement.requestPointerLock();
+    }
   };
 
   useCharacterAnimations(
@@ -89,7 +97,6 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
   
   useEmoteAnimations({
     groupRef: characterRef,
-    // 2. Lê o nome do emote diretamente do contexto
     emoteName: state.context.currentEmote, 
     loop: false,
     onEmoteFinished: onEmoteFinished,
@@ -101,10 +108,26 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
   useFrame(() => {
     if (!internalRef.current || !characterRef.current) return;
 
+    // --- Lógica enquanto está fazendo Emote ---
     if (state.matches('emoting')) {
+      const isTryingToMove = input.forward || input.backward || input.left || input.right;
+      
+      // Se o jogador tentar andar, cancela o emote
+      if (isTryingToMove) {
+        send({ type: input.sprint ? 'RUN' : 'WALK' });
+        
+        // Garante que o pointer lock esteja ativo ao cancelar o emote
+        if (document.pointerLockElement !== gl.domElement) {
+            gl.domElement.requestPointerLock();
+        }
+      }
+
+      // Zera a velocidade física durante o emote para ele não deslizar
       internalRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
       return; 
     }
+
+    // --- Lógica padrão de movimento ---
 
     const velocity = internalRef.current.linvel();
 
@@ -167,8 +190,14 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
       jumpPressed.current = false;
     }
 
+    // --- Lógica de Estados de Pulo e Aterrissagem ---
     if (state.matches('landing')) {
-    } else if (state.matches('jumping') || state.matches('runningJumping')) {
+       // Aguarda animação de landing (controlada por onLocomotionFinished)
+    } else if (
+      state.matches('jumping') || 
+      state.matches('runningJumping') || 
+      state.matches('walkingJumping') // <--- ADICIONADO: Suporte ao novo estado
+    ) {
       if (isGrounded) {
         send({ type: 'LAND' });
       }
