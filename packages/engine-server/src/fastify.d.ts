@@ -19,6 +19,9 @@ declare module 'fastify' {
             JWT_SECRET: string;
             SESSION_SECRET: string;
             MONGO_URI: string;
+            CLOUDINARY_CLOUD_NAME: string;
+            CLOUDINARY_API_KEY: string;
+            CLOUDINARY_API_SECRET: string;
         };
         vite: {
             ready(): Promise<void>;

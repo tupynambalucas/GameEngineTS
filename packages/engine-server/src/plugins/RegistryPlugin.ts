@@ -5,13 +5,15 @@ import secureSession from './SessionPlugin'
 import MongoosePlugin from './MongoosePlugin';
 import fp from 'fastify-plugin'
 import ApiPlugin from './ApiPlugin';
-import { resolve } from 'node:path'
+import AssetManagerPlugin from './AssetManagerPlugin';
+
 import type { FastifyPluginAsync } from 'fastify'
 
 const serverAutoRegistry: FastifyPluginAsync = async function (server) {
   await server.register(utils)
   await server.register(envConfig)
   await server.register(MongoosePlugin)
+  // await server.register(AssetManagerPlugin)
   await server.register(secureSession)
   await server.register(ApiPlugin, { prefix: '/api' });
 

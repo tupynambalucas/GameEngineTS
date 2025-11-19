@@ -4,7 +4,6 @@
   "description": "An Electron application with React and TypeScript",
   "main": "./out/main/index.js",
   "author": "example.com",
-  "homepage": "https://electron-vite.org",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
@@ -29,7 +28,7 @@
     "@electron-toolkit/eslint-config-ts": "^3.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",
     "electron": "^37.9.0",
-    "electron-builder": "^25.1.8",
+    "electron-builder": "^26.2.0",
     "electron-vite": "^4.0.0"
   }
 }

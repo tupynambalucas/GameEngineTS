@@ -24,8 +24,7 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
   const colliderRef = useRef<RapierCollider | null>(null);
 
   const { scene } = useGLTF(AmyUrl);
-  console.log('Loading Character Model: Amy.glb');
-  console.log(scene);
+
   const input = useInputControls();
   const { camera } = useThree();
 
@@ -34,7 +33,7 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
   const [state, send] = useMachine(PlayerStateMachine);
   const jumpPressed = useRef(false);
 
-  const [currentEmote, setCurrentEmote] = useState<string | null>(null);
+  // Removido: const [currentEmote, setCurrentEmote] = useState<string | null>(null);
 
   const openEmoteWheel = useGameStore((s) => s.openEmoteWheel);
   const closeEmoteWheel = useGameStore((s) => s.closeEmoteWheel);
@@ -57,8 +56,7 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
         const selectedEmote = closeEmoteWheel();
         
         if (selectedEmote) {
-          setCurrentEmote(selectedEmote);
-          send({ type: 'EMOTE' });
+          send({ type: 'EMOTE', emoteName: selectedEmote }); // 1. Envia o nome no evento
         } else {
           canvasElement?.requestPointerLock();
         }
@@ -80,19 +78,19 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
   
   const onEmoteFinished = () => {
     send({ type: 'EMOTE_FINISHED' });
-    setCurrentEmote(null);
     canvasElement?.requestPointerLock();
   };
 
   useCharacterAnimations(
     characterRef, 
-    state.matches('emoting') ? 'idle' : (state.value as string),
+    state.matches('emoting') ? null : (state.value as string),
     onLocomotionFinished
   );
   
   useEmoteAnimations({
     groupRef: characterRef,
-    emoteName: state.matches('emoting') ? currentEmote : null,
+    // 2. Lê o nome do emote diretamente do contexto
+    emoteName: state.context.currentEmote, 
     loop: false,
     onEmoteFinished: onEmoteFinished,
   });
@@ -125,10 +123,7 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
     direction.normalize();
 
     if (direction.length() > 0.1) {
-      // --- CORREÇÃO AQUI ---
-      // Revertido para a lógica original, que estava correta.
       const angle = Math.atan2(direction.x, direction.z);
-      // ---------------------
 
       const targetRotation = new THREE.Quaternion().setFromAxisAngle(
         new THREE.Vector3(0, 1, 0),
@@ -140,6 +135,7 @@ export const Player = forwardRef<RapierRigidBody>((props, ref) => {
       currentRotation.slerp(targetRotation, 0.15);
       internalRef.current.setRotation(currentRotation, true);
     }
+
     const speed = input.sprint
       ? PLAYER_PHYSICS.SPEED * PLAYER_PHYSICS.RUN_MULTIPLIER
       : PLAYER_PHYSICS.SPEED;

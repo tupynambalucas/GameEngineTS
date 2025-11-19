@@ -18,7 +18,6 @@ interface RectLightUserData {
 }
 
 const RectLightInstance: FC<{ node: THREE.Mesh }> = ({ node }) => {
-  console.log(node);
   const lightRef = useRef<THREE.RectAreaLight>(null!);
   useHelper(lightRef, RectAreaLightHelper, 'cyan');
   const { intensity, color } = (node.userData || {}) as RectLightUserData;
@@ -26,7 +25,7 @@ const RectLightInstance: FC<{ node: THREE.Mesh }> = ({ node }) => {
   const height = node.scale.y;
   const lightIntensity = intensity ?? 10.0;
   const lightColor = color ?? '#ffffff';
-  console.log(`ReactLightInstance [${node.name}]: width=${width}, height=${height}, intensity=${lightIntensity}, color=${lightColor}`);
+  
   return (
     <rectAreaLight
       ref={lightRef}
@@ -42,7 +41,7 @@ const RectLightInstance: FC<{ node: THREE.Mesh }> = ({ node }) => {
 
 export const LauncherScene: FC = () => {
   const { scene, cameras, nodes } = useGLTF(Model);
-  console.log('Loaded GLTF scene:', scene);
+  
   
   const blenderCamera = useMemo(() => cameras.find(isPerspectiveCamera), [cameras]);
   const existingLights = useMemo(() => {

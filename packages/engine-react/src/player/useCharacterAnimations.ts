@@ -13,7 +13,7 @@ const ANIMATION_MAP = {
 
 export const useCharacterAnimations = (
   groupRef: React.RefObject<THREE.Group | null>,
-  currentState: string,
+  currentState: string | null,
   onAnimationFinished: () => void
 ) => {
   const { animations } = useGLTF(LocomotionUrl);
@@ -27,7 +27,14 @@ export const useCharacterAnimations = (
   useEffect(() => {
     if (!actions || !groupRef.current) return;
 
-    if (currentState === 'landing') {
+    if (currentState === 'landing' || currentState === null) {
+      if (currentState === null) {
+        const oldAnimation = actions[currentAnimation.current!];
+        if (oldAnimation) {
+          oldAnimation.fadeOut(0.2);
+        }
+        currentAnimation.current = null;
+      }
       return;
     }
 
@@ -52,7 +59,6 @@ export const useCharacterAnimations = (
       current.reset().fadeIn(0.2).play();
       current.setLoop(THREE.LoopOnce, 1);
       
-      // 1. "CONGELA" A ANIMAÇÃO NO ÚLTIMO FRAME
       current.clampWhenFinished = true;
 
       const onFinish = (e: any) => {
@@ -60,16 +66,6 @@ export const useCharacterAnimations = (
           const mixer = current.getMixer();
           mixer.removeEventListener('finished', onFinish);
 
-          // 2. REMOVA A LÓGICA DO 'IDLE' - Não é mais necessário
-          /*
-          const idleAction = actions.Idle;
-          if (idleAction) {
-            idleAction.reset().play();
-            currentAnimation.current = 'Idle';
-          }
-          */
-
-          // 3. APENAS notifique a máquina de estados
           animFinishedCallback.current();
         }
       };

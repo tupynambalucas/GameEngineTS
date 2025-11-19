@@ -6,9 +6,8 @@
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
   pointer-events: auto;
-  z-index: 1000;
+  z-index: 100;
 }
 
 .wheelItem {

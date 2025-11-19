@@ -1,4 +1,4 @@
-import { createMachine } from 'xstate';
+import { createMachine, assign } from 'xstate';
 
 type PlayerEvent =
   | { type: 'WALK' }
@@ -8,12 +8,19 @@ type PlayerEvent =
   | { type: 'STOP_RUN' }
   | { type: 'LAND' } 
   | { type: 'ANIM_FINISHED'; isMoving: boolean; isSprinting: boolean }
-  | { type: 'EMOTE' }
+  | { type: 'EMOTE'; emoteName: string } 
   | { type: 'EMOTE_FINISHED' };
 
-export const PlayerStateMachine = createMachine({
+interface PlayerContext {
+  currentEmote: string | null;
+}
+
+export const PlayerStateMachine = createMachine<PlayerContext, PlayerEvent>({
   id: 'player',
   initial: 'idle',
+  context: {
+    currentEmote: null,
+  },
   types: {
     events: {} as PlayerEvent,
   },
@@ -22,7 +29,12 @@ export const PlayerStateMachine = createMachine({
       on: {
         WALK: 'walking',
         JUMP: 'jumping',
-        EMOTE: 'emoting',
+        EMOTE: {
+          target: 'emoting',
+          actions: assign({
+            currentEmote: ({ event }) => event.emoteName,
+          }),
+        },
       },
     },
     walking: {
@@ -30,7 +42,12 @@ export const PlayerStateMachine = createMachine({
         STOP: 'idle',
         JUMP: 'jumping',
         RUN: 'running',
-        EMOTE: 'emoting',
+        EMOTE: {
+          target: 'emoting',
+          actions: assign({
+            currentEmote: ({ event }) => event.emoteName,
+          }),
+        },
       },
     },
     running: {
@@ -69,7 +86,12 @@ export const PlayerStateMachine = createMachine({
     },
     emoting: {
       on: {
-        EMOTE_FINISHED: 'idle',
+        EMOTE_FINISHED: {
+          target: 'idle',
+          actions: assign({
+            currentEmote: null,
+          }),
+        }
       },
     },
   },

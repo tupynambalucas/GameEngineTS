@@ -41,6 +41,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   setEmoteSelection: (emote) => {
+    console.log(`Emote selected: ${emote}`);
     set({ currentEmoteSelection: emote });
   },
 

@@ -26,14 +26,20 @@ const envPlugin: FastifyPluginAsync = async (server) => {
       'SERVER_PORT',
       'JWT_SECRET',
       'SESSION_SECRET',
-      'MONGO_URI'
+      'MONGO_URI',
+      'CLOUDINARY_CLOUD_NAME',
+      'CLOUDINARY_API_KEY',
+      'CLOUDINARY_API_SECRET'
     ],
     properties: {
       SERVER_HOST: { type: 'string' },
       SERVER_PORT: { type: 'number' },
       JWT_SECRET: { type: 'string' },
       SESSION_SECRET: { type: 'string' },
-      MONGO_URI: { type: 'string' }
+      MONGO_URI: { type: 'string' },
+      CLOUDINARY_CLOUD_NAME: { type: 'string' },
+      CLOUDINARY_API_KEY: { type: 'string' },
+      CLOUDINARY_API_SECRET: { type: 'string' }
     },
   } as const;
 

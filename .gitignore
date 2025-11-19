@@ -12,6 +12,7 @@ node_modules/
 /plataforms/web/*.local
 /plataforms/web/.vite/
 
+
 # --- Logs ---
 *.log
 npm-debug.log*

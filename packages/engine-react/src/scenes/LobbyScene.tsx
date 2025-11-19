@@ -1,5 +1,5 @@
 import React from 'react';
-import { useGLTF, Environment, OrbitControls } from '@react-three/drei';
+import { useGLTF, Environment } from '@react-three/drei';
 import AmyUrl from '@tupynambagame/engine-assets/local/models/characters/Amy.glb';
 import { Npc } from '../world/npc/Npc';
 
