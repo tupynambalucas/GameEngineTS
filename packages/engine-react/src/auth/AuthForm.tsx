@@ -32,6 +32,7 @@ export const AuthForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isRegisterMode) {
+
       register(email, username, password);
     } else {
       login(identifier, password);

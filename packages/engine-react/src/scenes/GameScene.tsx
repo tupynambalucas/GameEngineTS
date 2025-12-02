@@ -1,21 +1,25 @@
-import React, { useRef } from 'react';
-import { Physics, RigidBody, RapierRigidBody } from '@react-three/rapier';
+import React, { useRef, useState, useCallback } from 'react'; // <--- Adicione useCallback
+import { Physics, RapierRigidBody } from '@react-three/rapier';
 import { Sky, Environment } from '@react-three/drei';
 import { Player } from '../player/Player';
 import { CameraController } from '../player/CameraController';
+import { GameMap } from '../world/map/Map'; // Certifique-se do caminho correto (Map ou GameMap)
 import { WORLD_PHYSICS } from '@tupynambagame/engine-core';
-
-const Floor = () => (
-  <RigidBody type="fixed" colliders="cuboid">
-    <mesh position={[0, -1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[100, 100]} />
-      <meshStandardMaterial color="#444" />
-    </mesh>
-  </RigidBody>
-);
+import NightclubUrl from '@tupynambagame/engine-assets/local/models/maps/nightclub.glb'; 
 
 export const GameScene: React.FC = () => {
   const playerRef = useRef<RapierRigidBody>(null);
+  const [spawnPos, setSpawnPos] = useState<[number, number, number] | null>(null);
+
+  // FIX: Use useCallback para garantir que essa função seja a mesma entre renders
+  const handleSpawnFound = useCallback((pos: [number, number, number]) => {
+    setSpawnPos((current) => {
+      // Só atualiza se for diferente para evitar re-render desnecessário
+      if (!current) return pos;
+      if (current[0] === pos[0] && current[1] === pos[1] && current[2] === pos[2]) return current;
+      return pos;
+    });
+  }, []);
 
   return (
     <>
@@ -29,11 +33,22 @@ export const GameScene: React.FC = () => {
       />
 
       <Physics debug gravity={WORLD_PHYSICS.GRAVITY}>
-        <Player ref={playerRef} />
-        <Floor />
-      </Physics>
+        
+        <GameMap 
+          mapUrl={NightclubUrl} 
+          onSpawnFound={handleSpawnFound} // <--- Passa a função memoizada
+        />
 
-      <CameraController target={playerRef} />
+        {spawnPos && (
+          <Player 
+            ref={playerRef} 
+            initialPosition={spawnPos} 
+          />
+        )}
+
+      </Physics>
+      
+      {spawnPos && <CameraController target={playerRef} />}
     </>
   );
 };

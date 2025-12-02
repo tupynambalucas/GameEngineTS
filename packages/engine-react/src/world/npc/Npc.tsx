@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
+import { SkeletonUtils } from 'three-stdlib'; // Adicionado
 import { useEmoteAnimations } from '../../hooks/useEmoteAnimations';
 
 interface NpcProps {
@@ -12,7 +13,10 @@ interface NpcProps {
 
 export const Npc: React.FC<NpcProps> = ({ modelUrl, emoteName, position, rotation }) => {
   const characterRef = useRef<THREE.Group | null>(null);
-  const { scene } = useGLTF(modelUrl);
+  const { scene: gltfScene } = useGLTF(modelUrl);
+
+  // FIX: Clona a cena para não sujar o cache global
+  const scene = useMemo(() => SkeletonUtils.clone(gltfScene), [gltfScene]);
 
   useEmoteAnimations({
     groupRef: characterRef,

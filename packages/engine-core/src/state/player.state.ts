@@ -33,7 +33,7 @@ export const PlayerStateMachine = playerSetup.createMachine({
       on: {
         WALK: { target: 'walking' },
         RUN: { target: 'running' }, 
-        JUMP: { target: 'jumping' }, // Pulo parado
+        JUMP: { target: 'jumping' }, 
         EMOTE: {
           target: 'emoting',
           actions: assign({
@@ -45,7 +45,7 @@ export const PlayerStateMachine = playerSetup.createMachine({
     walking: {
       on: {
         STOP: { target: 'idle' },
-        JUMP: { target: 'walkingJumping' }, // ALTERADO: Agora vai para WalkingJumping
+        JUMP: { target: 'walkingJumping' }, 
         RUN: { target: 'running' },
         EMOTE: {
           target: 'emoting',
@@ -59,42 +59,27 @@ export const PlayerStateMachine = playerSetup.createMachine({
       on: {
         STOP: { target: 'idle' },
         STOP_RUN: { target: 'walking' },
-        JUMP: { target: 'runningJumping' }, // Pulo correndo
+        JUMP: { target: 'runningJumping' }, 
       },
     },
     jumping: {
       on: {
-        LAND: { target: 'landing' },
+        // FIX: LAND agora vai direto para idle. 
+        // Se o jogador estiver segurando teclas, o loop do Player.tsx enviará WALK/RUN no frame seguinte.
+        LAND: { target: 'idle' },
       },
     },
-    // NOVO ESTADO
     walkingJumping: {
       on: {
-        LAND: { target: 'landing' },
+        LAND: { target: 'idle' },
       },
     },
     runningJumping: {
       on: {
-        LAND: { target: 'landing' },
+        LAND: { target: 'idle' },
       },
     },
-    landing: {
-      on: {
-        ANIM_FINISHED: [
-          {
-            target: 'running',
-            guard: ({ event }) => event.type === 'ANIM_FINISHED' && event.isMoving && event.isSprinting,
-          },
-          {
-            target: 'walking',
-            guard: ({ event }) => event.type === 'ANIM_FINISHED' && event.isMoving,
-          },
-          {
-            target: 'idle',
-          },
-        ],
-      },
-    },
+    // O estado 'landing' foi removido/simplificado pois causava deadlock sem animação
     emoting: {
       on: {
         WALK: { target: 'walking', actions: assign({ currentEmote: null }) },
